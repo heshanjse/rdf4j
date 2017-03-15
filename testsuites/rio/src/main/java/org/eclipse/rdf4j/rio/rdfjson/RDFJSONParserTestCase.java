@@ -7,14 +7,8 @@
  *******************************************************************************/
 package org.eclipse.rdf4j.rio.rdfjson;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Statement;
@@ -30,8 +24,13 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 import org.eclipse.rdf4j.rio.ntriples.NTriplesParser;
-import org.eclipse.rdf4j.rio.ntriples.NTriplesWriter;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * JUnit test for the RDFJSON Parser.
@@ -210,7 +209,7 @@ public abstract class RDFJSONParserTestCase {
 			rdfjsonParser.setRDFHandler(inputCollector);
 
 			InputStream in = this.getClass().getResourceAsStream(inputURL);
-			rdfjsonParser.parse(in, baseURL);
+			rdfjsonParser.parse(new InputStreamReader(in) , baseURL);
 			in.close();
 
 			// Parse expected output data
