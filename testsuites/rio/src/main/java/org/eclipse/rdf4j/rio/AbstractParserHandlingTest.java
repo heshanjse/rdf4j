@@ -7,15 +7,6 @@
  *******************************************************************************/
 package org.eclipse.rdf4j.rio;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -25,19 +16,24 @@ import org.eclipse.rdf4j.model.util.Models;
 import org.eclipse.rdf4j.model.vocabulary.DC;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
-import org.eclipse.rdf4j.rio.DatatypeHandler;
-import org.eclipse.rdf4j.rio.ParserConfig;
-import org.eclipse.rdf4j.rio.RDFParseException;
-import org.eclipse.rdf4j.rio.RDFParser;
-import org.eclipse.rdf4j.rio.RioSetting;
 import org.eclipse.rdf4j.rio.helpers.BasicParserSettings;
 import org.eclipse.rdf4j.rio.helpers.ParseErrorCollector;
+import org.eclipse.rdf4j.rio.helpers.SimpleParseLocationListener;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
+import org.eclipse.rdf4j.rio.nquads.AbstractNQuadsParserUnitTest;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+
+import static org.junit.Assert.*;
 
 /**
  * Abstract tests to confirm consistent behaviour for the datatype and language handling settings.
@@ -947,5 +943,68 @@ public abstract class AbstractParserHandlingTest {
 		result.add(vf.createStatement(vf.createBNode(), RDFS.COMMENT,
 				vf.createLiteral(languageValue, languageTag)));
 		return result;
+	}
+
+
+	private class TestParseLocationListener extends SimpleParseLocationListener {
+
+		private void assertListener(int row, int col) {
+			Assert.assertEquals("Unexpected last row", row, this.getLineNo());
+			Assert.assertEquals("Unexpected last col", col, this.getColumnNo());
+		}
+
+	}
+
+	private class TestRDFHandler extends StatementCollector {
+
+		private boolean started = false;
+
+		private boolean ended = false;
+
+		@Override
+		public void startRDF()
+				throws RDFHandlerException
+		{
+			super.startRDF();
+			started = true;
+		}
+
+		@Override
+		public void endRDF()
+				throws RDFHandlerException
+		{
+			super.endRDF();
+			ended = true;
+		}
+
+		public void assertHandler(int expected) {
+			Assert.assertTrue("Never started.", started);
+			Assert.assertTrue("Never ended.", ended);
+			Assert.assertEquals("Unexpected number of statements.", expected, getStatements().size());
+		}
+	}
+	@Test
+	(expected = RDFParseException.class)
+		public void testNullRdfHandlerReader() throws IOException {
+	//	getParser().parse(new InputStreamReader(new ByteArrayInputStream("".getBytes())) , "");
+		RDFParser parser = getParser();
+		TestRDFHandler rdfHandler = new TestRDFHandler();
+
+		TestParseLocationListener parseLocationListerner = new TestParseLocationListener();
+		parser.setParseLocationListener(parseLocationListerner);
+		parser.setRDFHandler(rdfHandler);
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(AbstractNQuadsParserUnitTest.class.getResourceAsStream("/testcases/nquads/test1.nq")));
+		parser.parse(br, "http://test.base.uri");
+
+
+		rdfHandler.assertHandler(6);
+		parseLocationListerner.assertListener(9, 1);
+	}
+
+	@Test
+	(expected = RDFParseException.class)
+		public void testNullRdfHandlerInputStream() throws IOException {
+		getParser().parse(new ByteArrayInputStream("".getBytes()), "");
 	}
 }
