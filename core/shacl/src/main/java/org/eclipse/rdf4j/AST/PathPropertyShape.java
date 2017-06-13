@@ -14,7 +14,7 @@ import java.util.List;
  * Created by heshanjayasinghe on 6/11/17.
  */
 public class PathPropertyShape extends PropertyShape {
-    List<Path> paths = new ArrayList<>();
+   Path path;
 
     public PathPropertyShape(Resource id, SailRepositoryConnection connection) {
         super(id, connection);

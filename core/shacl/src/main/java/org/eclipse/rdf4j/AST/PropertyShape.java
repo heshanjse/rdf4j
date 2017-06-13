@@ -21,8 +21,7 @@ public class PropertyShape{
 
 
     static class Factory{
-        List<PropertyShape> ret;
-        List< PropertyShape > getProprtyShapes(Resource propertyShapeId, SailRepositoryConnection connection){
+      public static   List< PropertyShape > getProprtyShapes(Resource propertyShapeId, SailRepositoryConnection connection){
             ret = new ArrayList<>();
 
             if(!hasMinCount(propertyShapeId, connection)){
