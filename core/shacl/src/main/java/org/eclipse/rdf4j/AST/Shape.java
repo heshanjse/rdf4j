@@ -1,19 +1,22 @@
 package org.eclipse.rdf4j.AST;
 
+import examplePlan.PlanNode;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SHACL;
 import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
+import org.eclipse.rdf4j.validation.ShaclSailConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by heshanjayasinghe on 6/10/17.
  */
-public class Shape {
+public class Shape  implements PlanGenerator{
     Resource id;
     List<PropertyShape> propertyShapes;
     TargetClass targetClass;
@@ -26,6 +29,19 @@ public class Shape {
 //            targetClass = new TargetClass(id, connection);
 //        }
     }
+
+    @Override
+    public PlanNode getPlan() {
+        return null;
+    }
+
+    public List<PlanNode> generatePlans(ShaclSailConnection shaclSailConnection) {
+        return propertyShapes
+            .stream()
+            .map(propertyShape -> propertyShape.getPlan())
+            .collect(Collectors.toList());
+    }
+
 
     public static class Factory {
 

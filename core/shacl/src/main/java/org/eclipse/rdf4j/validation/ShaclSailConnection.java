@@ -26,6 +26,9 @@ public class ShaclSailConnection extends NotifyingSailConnectionWrapper{
 
 	@Override
 	public void commit() throws SailException {
+
+		sail.validate(this);
+
 		super.commit();
 
 	}

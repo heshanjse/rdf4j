@@ -1,5 +1,6 @@
 package org.eclipse.rdf4j.AST;
 
+import examplePlan.PlanNode;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.SHACL;
@@ -12,6 +13,7 @@ import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 public class MinCountPropertyShape extends PathPropertyShape{
 
     public Integer minCount;
+    Shape shape;
 
     public MinCountPropertyShape(Resource id, SailRepositoryConnection connection) {
         super(id,connection);
@@ -25,5 +27,24 @@ public class MinCountPropertyShape extends PathPropertyShape{
         return "MinCountPropertyShape{" +
                 "minCount=" + minCount +
                 '}';
+    }
+
+    @Override
+    public PlanNode getPlan() {
+
+        PlanNode properties = super.getPlan();
+        PlanNode instancesOfTargetClass = shape.getPlan();
+
+        PlanNode join = new OuterLeftJoin(instancesOfTargetClass, properties);
+
+        PlanNode groupBy = new GroupBy(join, condition);
+
+        PlanNode count = new Count(groupBy);
+
+
+        PlanNode validate = ValidateMinCount(count, minCount);
+
+
+        return validate;
     }
 }

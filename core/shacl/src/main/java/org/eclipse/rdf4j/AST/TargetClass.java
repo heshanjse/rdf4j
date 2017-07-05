@@ -1,5 +1,7 @@
 package org.eclipse.rdf4j.AST;
 
+import examplePlan.PlanNode;
+import examplePlan.Select;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.vocabulary.SHACL;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
@@ -7,7 +9,7 @@ import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 /**
  * Created by heshanjayasinghe on 6/10/17.
  */
-public class TargetClass extends Shape {
+public class TargetClass extends Shape{
     Resource id;
     SailRepositoryConnection connection;
     Resource targetClass;
@@ -20,5 +22,11 @@ public class TargetClass extends Shape {
         if(connection.hasStatement(id, SHACL.TARGET_CLASS, null, true)){
             targetClass = (Resource) connection.getStatements(id, SHACL.TARGET_CLASS, null).next().getObject();
         }
+    }
+
+
+    @Override
+    public PlanNode getPlan() {
+        return new Select();
     }
 }

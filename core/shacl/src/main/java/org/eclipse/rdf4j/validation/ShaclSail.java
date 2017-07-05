@@ -1,5 +1,6 @@
 package org.eclipse.rdf4j.validation;
 
+import examplePlan.PlanNode;
 import org.eclipse.rdf4j.AST.Shape;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
@@ -96,4 +97,19 @@ public class ShaclSail extends NotifyingSailWrapper {
 
     }
 
+    public void validate(ShaclSailConnection shaclSailConnection) {
+
+        for (Shape shape : shapes) {
+            List<PlanNode> plans = shape.generatePlans(shaclSailConnection);
+
+            for (PlanNode v : plans) {
+                if(!v.validate()){
+                    throw new RuntimeException("Invalid repo");
+                }
+            }
+
+        }
+
+
+    }
 }
